@@ -1,120 +1,140 @@
 #include "raylib.h"
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
-#define CELL_SIZE 20
-#define GRID_WIDTH 40
-#define GRID_HEIGHT 30
+#define CELL_SIZE 32
+#define GRID_WIDTH  20
+#define GRID_HEIGHT 15
 #define MAX_SNAKE_LENGTH (GRID_WIDTH * GRID_HEIGHT)
 
 typedef struct {
     int x, y;
 } Vector2i;
 
-int main() {
-    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "SnakeBird - Peibol y Pollos");
+typedef struct {
+    int x, y, w, h;
+} Platform;
+
+// -----------------------------------------------------
+// FUNCIONES AUXILIARES
+// -----------------------------------------------------
+bool CellInsideGrid(Vector2i c) {
+    return c.x >= 0 && c.x < GRID_WIDTH && c.y >= 0 && c.y < GRID_HEIGHT;
+}
+
+bool CollidesWithPlatform(Vector2i pos, Platform *plats, int count) {
+    for (int i = 0; i < count; i++) {
+        if (pos.x >= plats[i].x && pos.x < plats[i].x + plats[i].w &&
+            pos.y >= plats[i].y && pos.y < plats[i].y + plats[i].h)
+            return true;
+    }
+    return false;
+}
+
+bool IsOnGround(Vector2i *snake, int len, Platform *plats, int count) {
+    for (int i = 0; i < len; i++) {
+        Vector2i below = { snake[i].x, snake[i].y + 1 };
+        if (below.y >= GRID_HEIGHT) return true; // suelo
+        if (CollidesWithPlatform(below, plats, count)) return true;
+        // parte del cuerpo debajo
+        for (int j = 0; j < len; j++) {
+            if (i != j && snake[j].x == below.x && snake[j].y == below.y)
+                return true;
+        }
+    }
+    return false;
+}
+
+// -----------------------------------------------------
+// PROGRAMA PRINCIPAL
+// -----------------------------------------------------
+int main(void) {
+    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snakebird by Peibol y Pollos");
     SetTargetFPS(60);
+
+    // --- Plataformas ---
+    Platform platforms[3] = {
+        {0, GRID_HEIGHT - 1, GRID_WIDTH, 1},    // suelo
+        {5, 10, 5, 1},                         // plataforma media
+        {12, 7, 3, 1}                          // plataforma alta
+    };
+    int platformCount = 3;
+
+    // --- Serpiente ---
     Vector2i snake[MAX_SNAKE_LENGTH];
-    int snakeLength = 3;
-    snake[0] = (Vector2i){GRID_WIDTH / 2, GRID_HEIGHT / 2};
-    snake[1] = (Vector2i){snake[0].x - 1, snake[0].y};
-    snake[2] = (Vector2i){snake[1].x - 1, snake[1].y};
+    int snakeLength = 4;
+    snake[0] = (Vector2i){5, 5};
+    snake[1] = (Vector2i){5, 6};
+    snake[2] = (Vector2i){5, 7};
+    snake[3] = (Vector2i){5, 8};
 
-    Vector2i direction = {0, 0}; // No se mueve al inicio
-    Vector2i food;
-    bool foodExists = false;
-    bool gameOver = false;
-
-    srand(time(NULL));
+    // --- Variables ---
+    bool moved = false;
+    float gravityTimer = 0;
+    const float gravityDelay = 0.25f; // caída más lenta
 
     while (!WindowShouldClose()) {
-        if (!gameOver) {
-            // Detectar dirección y mover solo cuando se presione una tecla
-            bool moved = false;
-            Vector2i newDir = direction;
+        float dt = GetFrameTime();
+        gravityTimer += dt;
+        moved = false;
 
-            if (IsKeyPressed(KEY_UP) && direction.y == 0) { newDir = (Vector2i){0, -1}; moved = true; }
-            if (IsKeyPressed(KEY_DOWN) && direction.y == 0) { newDir = (Vector2i){0, 1}; moved = true; }
-            if (IsKeyPressed(KEY_LEFT) && direction.x == 0) { newDir = (Vector2i){-1, 0}; moved = true; }
-            if (IsKeyPressed(KEY_RIGHT) && direction.x == 0) { newDir = (Vector2i){1, 0}; moved = true; }
+        // --- Movimiento manual (por tecla) ---
+        Vector2i dir = {0, 0};
+        if (IsKeyPressed(KEY_RIGHT)) { dir = (Vector2i){1, 0}; moved = true; }
+        if (IsKeyPressed(KEY_LEFT))  { dir = (Vector2i){-1, 0}; moved = true; }
+        if (IsKeyPressed(KEY_UP))    { dir = (Vector2i){0, -1}; moved = true; }
+        if (IsKeyPressed(KEY_DOWN))  { dir = (Vector2i){0, 1}; moved = true; }
 
-            if (moved || (direction.x != 0 || direction.y != 0)) {
-                // Solo mover si se presionó una tecla o ya hay dirección activa
-                direction = newDir;
+        if (moved) {
+            Vector2i newHead = {snake[0].x + dir.x, snake[0].y + dir.y};
 
-                // Generar comida si no existe
-                if (!foodExists) {
-                    food.x = rand() % GRID_WIDTH;
-                    food.y = rand() % GRID_HEIGHT;
-                    foodExists = true;
-                }
-
-                // Si se presionó una tecla de movimiento, mover la serpiente una celda
-                if (moved) {
-                    for (int i = snakeLength - 1; i > 0; i--) {
-                        snake[i] = snake[i - 1];
-                    }
-
-                    snake[0].x += direction.x;
-                    snake[0].y += direction.y;
-
-                    // Comprobar colisiones con bordes
-                    if (snake[0].x < 0 || snake[0].x >= GRID_WIDTH ||
-                        snake[0].y < 0 || snake[0].y >= GRID_HEIGHT) {
-                        gameOver = true;
-                    }
-
-                    // Comprobar colisiones con el cuerpo
-                    for (int i = 1; i < snakeLength; i++) {
-                        if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
-                            gameOver = true;
-                            break;
-                        }
-                    }
-
-                    // Comer comida
-                    if (snake[0].x == food.x && snake[0].y == food.y) {
-                        if (snakeLength < MAX_SNAKE_LENGTH) {
-                            snake[snakeLength] = snake[snakeLength - 1];
-                            snakeLength++;
-                        }
-                        foodExists = false;
-                    }
-                }
-            }
-        } else {
-            // Reiniciar juego
-            if (IsKeyPressed(KEY_R)) {
-                snakeLength = 3;
-                snake[0] = (Vector2i){GRID_WIDTH / 2, GRID_HEIGHT / 2};
-                snake[1] = (Vector2i){snake[0].x - 1, snake[0].y};
-                snake[2] = (Vector2i){snake[1].x - 1, snake[1].y};
-                direction = (Vector2i){0, 0};
-                foodExists = false;
-                gameOver = false;
+            // Validar que no salga ni atraviese plataformas
+            if (CellInsideGrid(newHead) && !CollidesWithPlatform(newHead, platforms, platformCount)) {
+                // Mover cuerpo
+                for (int i = snakeLength - 1; i > 0; i--)
+                    snake[i] = snake[i - 1];
+                snake[0] = newHead;
             }
         }
 
-        // --- Dibujo ---
+        // --- Gravedad ---
+        if (gravityTimer >= gravityDelay) {
+            gravityTimer = 0;
+            if (!IsOnGround(snake, snakeLength, platforms, platformCount)) {
+                // Caer todo el cuerpo
+                for (int i = 0; i < snakeLength; i++) {
+                    Vector2i below = {snake[i].x, snake[i].y + 1};
+                    if (!CollidesWithPlatform(below, platforms, platformCount) && below.y < GRID_HEIGHT)
+                        snake[i].y += 1;
+                }
+            }
+        }
+
+        // --- DIBUJO ---
         BeginDrawing();
-        ClearBackground(DARKGRAY);
+        ClearBackground((Color){25, 25, 40, 255});
 
-        if (!gameOver) {
-            // Dibuja comida
-            if (foodExists)
-                DrawRectangle(food.x * CELL_SIZE, food.y * CELL_SIZE, CELL_SIZE, CELL_SIZE, RED);
-
-            // Dibuja serpiente
-            for (int i = 0; i < snakeLength; i++) {
-                Color color = (i == 0) ? GREEN : LIME;
-                DrawRectangle(snake[i].x * CELL_SIZE, snake[i].y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1, color);
+        // Dibujar cuadrícula
+        for (int y = 0; y < GRID_HEIGHT; y++) {
+            for (int x = 0; x < GRID_WIDTH; x++) {
+                DrawRectangleLines(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, (Color){255, 255, 255, 25});
             }
-
-          
-        } else {
-            DrawText("GAME OVER!", 300, 260, 40, RED);
-            DrawText("Pressiona R", 270, 310, 20, WHITE);
         }
+
+        // Dibujar plataformas
+        for (int i = 0; i < platformCount; i++) {
+            DrawRectangle(platforms[i].x * CELL_SIZE, platforms[i].y * CELL_SIZE,
+                          platforms[i].w * CELL_SIZE, platforms[i].h * CELL_SIZE, BROWN);
+        }
+
+        // Dibujar serpiente
+        for (int i = 0; i < snakeLength; i++) {
+            Color c = (i == 0) ? GREEN : LIME;
+            DrawRectangle(snake[i].x * CELL_SIZE, snake[i].y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1, c);
+        }
+
+        DrawText("Movimiento tipo Snakebird (por tecla, con gravedad)", 10, 10, 20, RAYWHITE);
 
         EndDrawing();
     }
