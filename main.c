@@ -12,7 +12,7 @@ typedef struct {
 } Vector2i;
 
 int main() {
-    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snake (Manual Movement) - Raylib C");
+    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snake by pollos y peibol");
     SetTargetFPS(60);
 
     Vector2i snake[MAX_SNAKE_LENGTH];
