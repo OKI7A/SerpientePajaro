@@ -12,9 +12,8 @@ typedef struct {
 } Vector2i;
 
 int main() {
-    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snake (Manual Movement) - Raylib C");
+    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "SnakeBird - Peibol y Pollos");
     SetTargetFPS(60);
-
     Vector2i snake[MAX_SNAKE_LENGTH];
     int snakeLength = 3;
     snake[0] = (Vector2i){GRID_WIDTH / 2, GRID_HEIGHT / 2};
