@@ -134,7 +134,7 @@ int main(void) {
             DrawRectangle(snake[i].x * CELL_SIZE, snake[i].y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1, c);
         }
 
-        DrawText("Movimiento tipo Snakebird (por tecla, con gravedad)", 10, 10, 20, RAYWHITE);
+        DrawText("Snakebird by POLLEIBOL", 10, 10, 20, RAYWHITE);
 
         EndDrawing();
     }
