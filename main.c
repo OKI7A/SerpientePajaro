@@ -11,7 +11,7 @@
 typedef struct {
     int x, y;
 } Vector2i;
-
+// pollos es el mejor del universo si o yeah yeeeeeeetttt 4 letters one word 
 typedef struct {
     int x, y, w, h;
 } Platform;
