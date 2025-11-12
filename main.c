@@ -3,8 +3,8 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define CELL_SIZE 32
-#define GRID_WIDTH  20
+#define CELL_SIZE 22
+#define GRID_WIDTH  30
 #define GRID_HEIGHT 15
 #define MAX_SNAKE_LENGTH (GRID_WIDTH * GRID_HEIGHT)
 
@@ -56,8 +56,8 @@ int main(void) {
     // --- Plataformas ---
     Platform platforms[3] = {
         {0, GRID_HEIGHT - 1, GRID_WIDTH, 1},    // suelo
-        {5, 10, 5, 1},                         // plataforma media
-        {12, 7, 3, 1}                          // plataforma alta
+        {5, 12, 5, 1},                         // plataforma media
+        {12, 7, 3, 1},                       // plataforma alta
     };
     int platformCount = 3;
 
@@ -134,7 +134,7 @@ int main(void) {
             DrawRectangle(snake[i].x * CELL_SIZE, snake[i].y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1, c);
         }
 
-        DrawText("Snakebird by Pollos y Peibol)", 10, 10, 20, RAYWHITE);
+        DrawText("Snakebird by Pollos y Peibol", 10, 10, 20, RAYWHITE);
 
         EndDrawing();
     }
