@@ -50,7 +50,7 @@ bool IsOnGround(Vector2i *snake, int len, Platform *plats, int count) {
 // PROGRAMA PRINCIPAL
 // -----------------------------------------------------
 int main(void) {
-    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snakebird simple - Raylib");
+    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snakebird");
     SetTargetFPS(60);
 
     // --- Plataformas ---
