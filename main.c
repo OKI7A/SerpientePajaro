@@ -111,7 +111,7 @@ int main(void) {
             }
         }
 
-        // --- DIBUJO ---
+        // --- DIBUJO ----
         BeginDrawing();
         ClearBackground((Color){25, 25, 40, 255});
 
