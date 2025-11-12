@@ -51,7 +51,7 @@ bool SnakeSupported(Vector2i *snake, int len, Platform *plats, int count) {
     return false;
 }
 
-// Genera una fruta 
+// Genera una fruta en una posición libre del mapa
 Vector2i GenerateFruit(Vector2i *snake, int len, Platform *plats, int platCount) {
     Vector2i pos;
     do {
@@ -65,7 +65,7 @@ Vector2i GenerateFruit(Vector2i *snake, int len, Platform *plats, int platCount)
 // PROGRAMA PRINCIPAL
 
 int main(void) {
-    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snakebird");
+    InitWindow(GRID_WIDTH * CELL_SIZE, GRID_HEIGHT * CELL_SIZE, "Snakebird by Pollos y Peibol");
     SetTargetFPS(60);
     srand(time(NULL));
 
@@ -106,6 +106,7 @@ int main(void) {
         if (IsKeyPressed(KEY_RIGHT)) { dir = (Vector2i){1, 0}; moved = true; }
         if (IsKeyPressed(KEY_LEFT))  { dir = (Vector2i){-1, 0}; moved = true; }
         if (IsKeyPressed(KEY_UP))    { dir = (Vector2i){0, -1}; moved = true; }
+        if (IsKeyPressed(KEY_DOWN))  { dir = (Vector2i){0, 1}; moved = true; } // 🔹 AHORA FUNCIONA ↓
 
         if (moved) {
             Vector2i newHead = {snake[0].x + dir.x, snake[0].y + dir.y};
@@ -158,7 +159,7 @@ int main(void) {
         // Dibujar cuadrícula
         for (int y = 0; y < GRID_HEIGHT; y++) {
             for (int x = 0; x < GRID_WIDTH; x++) {
-                DrawRectangleLines(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, (Color){35, 35, 55, 255});
+                DrawRectangleLines(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, (Color){25, 25, 40, 255});
             }
         }
 
@@ -181,7 +182,7 @@ int main(void) {
             DrawRectangle(snake[i].x * CELL_SIZE, snake[i].y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1, c);
         }
 
-        DrawText("Snakebird by pollo y peibol", 10, 10, 20, RAYWHITE);
+        DrawText("Snakebird by Pollos y Peibol", 10, 10, 20, RAYWHITE);
         EndDrawing();
     }
 
