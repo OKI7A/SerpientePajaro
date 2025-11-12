@@ -11,7 +11,7 @@
 typedef struct {
     int x, y;
 } Vector2i;
-// pollos es el mejor del universo si o yeah yeeeeeeetttt 4 letters one word geee ge yeet
+
 typedef struct {
     int x, y, w, h;
 } Platform;
@@ -72,14 +72,14 @@ int main(void) {
     // --- Variables ---
     bool moved = false;
     float gravityTimer = 0;
-    const float gravityDelay = 0.25f; // caída más lenta
+    const float gravityDelay = 0.25f; 
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         gravityTimer += dt;
         moved = false;
 
-        // --- Movimiento manual (por tecla) ---
+        // --- Movimiento manual ---
         Vector2i dir = {0, 0};
         if (IsKeyPressed(KEY_RIGHT)) { dir = (Vector2i){1, 0}; moved = true; }
         if (IsKeyPressed(KEY_LEFT))  { dir = (Vector2i){-1, 0}; moved = true; }
@@ -111,14 +111,14 @@ int main(void) {
             }
         }
 
-        // --- DIBUJO ----
+        // --- DIBUJO ---
         BeginDrawing();
         ClearBackground((Color){25, 25, 40, 255});
 
         // Dibujar cuadrícula
         for (int y = 0; y < GRID_HEIGHT; y++) {
             for (int x = 0; x < GRID_WIDTH; x++) {
-                DrawRectangleLines(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, (Color){255, 255, 255, 25});
+                DrawRectangleLines(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, (Color){25, 25, 40, 255});
             }
         }
 
@@ -134,7 +134,7 @@ int main(void) {
             DrawRectangle(snake[i].x * CELL_SIZE, snake[i].y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1, c);
         }
 
-        DrawText("Snakebird by Pollos y Peibol", 10, 10, 20, RAYWHITE);
+        DrawText("Snakebird by Pollos y Peibol)", 10, 10, 20, RAYWHITE);
 
         EndDrawing();
     }
